@@ -223,7 +223,7 @@ def get_readable_capabilities(caps: int) -> List[str]:
     :return: A list of readable capabilities.
     """
     capabilities = []
-    for i in range(24):
+    for i in range(32):
         if caps & (1 << i):
             capability = caps & (1 << i)
             capabilities.append(CAPABILITIES.get(capability, f"unknown capability 0x{capability:x}"))
