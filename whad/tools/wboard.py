@@ -346,7 +346,7 @@ def build_parser():
     raw_pcm.add_argument("--chunk-size", type=parse_int, default=128)
     audio_metrics = add_leaf(audio, "metrics", request_audio_metrics)
     audio_metrics.add_argument("--count", type=parse_int, default=0)
-    audio_metrics.add_argument("--timeout", type=float, default=5.0)
+    audio_metrics.set_defaults(timeout=5.0)
 
     output = subcommands.add_parser("output").add_subparsers(dest="output_command", required=True)
     output_set = add_leaf(output, "set", request_output_set)
