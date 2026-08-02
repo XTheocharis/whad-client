@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.pyc
+
+# AI agent workspace files (per-repo, not upstream)
+AGENTS.md
