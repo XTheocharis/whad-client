@@ -34,7 +34,7 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
 ]
 dependencies = [
-    "protobuf>=6.30",
+    "protobuf>=7.35.1",
     "scapy~=2.6.1",
     "pyserial~=3.5.0",
     "pycryptodomex>=3.11.0",
@@ -53,6 +53,7 @@ dependencies = [
 [project.scripts]
 whadup = "whad.tools.whadup:main"
 wup = "whad.tools.whadup:main"
+wboard = "whad.tools.wboard:main"
 wanalyze = "whad.tools.wanalyze:wanalyze_main"
 wsniff = "whad.tools.wsniff:wsniff_main"
 winject = "whad.tools.winject:winject_main"

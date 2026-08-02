@@ -21,6 +21,7 @@ class Domain:
     ANT = 0x09000000
     ANT_Plus = 0x0A000000
     ANT_FS = 0x0B000000
+    Board = 0x0C000000
 
 class Capability:
     """Device capability
@@ -34,6 +35,10 @@ class Capability:
     Hook = 0x20
     SimulateRole = 0x40
     NoRawData = 0x80
+    Read = 0x100
+    Write = 0x200
+    Stream = 0x400
+    Store = 0x800
 
 class DeviceType:
     """Device type

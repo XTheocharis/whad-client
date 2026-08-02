@@ -37,6 +37,7 @@ class Domain(StrEnum):
     RF4CE = 'rf4ce'
     UNIFYING = 'unifying'
     ZIGBEE = 'zigbee'
+    BOARD = 'board'
 
 class ProtocolHub(Registry):
     """WHAD Protocol Hub class
@@ -104,6 +105,10 @@ class ProtocolHub(Registry):
     def unifying(self):
         return self.get('unifying')
 
+    @property
+    def board(self):
+        return self.get('board')
+
     def load(self, factory: str) -> Optional[Type[Registry]]:
         """Lazy loading of factory class (dedicated registry).
 
@@ -133,6 +138,9 @@ class ProtocolHub(Registry):
         elif factory == 'unifying':
             from .unifying import UnifyingDomain
             return UnifyingDomain
+        elif factory == 'board':
+            from .board import BoardDomain
+            return BoardDomain
 
         # Not found
         logger.warning(
@@ -206,4 +214,3 @@ class ProtocolHub(Registry):
             logger.error('[hub] convert_packet(): packet is unknown !')
 
         return msg
-

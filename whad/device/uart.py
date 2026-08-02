@@ -10,6 +10,9 @@ import select
 from time import sleep
 from queue import Empty
 
+# Apply CDC ACM termios compatibility shim before importing pyserial.
+from whad import _termios_patch  # noqa: F401
+
 # Import serial
 from serial import Serial
 from serial.tools.list_ports import comports
@@ -132,6 +135,28 @@ class Uart(Device):
         Open device.
         """
         if not self.__opened:
+            # For CDC ACM devices, ensure DTR is set before opening the serial
+            # port. The Linux kernel 7.1.5 cdc_acm driver doesn't send
+            # SET_CONTROL_LINE_STATE on tty open, so the nRF52 firmware's
+            # read_any() rejects incoming data without DTR set. Use pyusb to
+            # send the control transfer directly.
+            if self.__is_acm:
+                try:
+                    import usb.core
+                    port_info = get_port_info(self.__port)
+                    if port_info is not None:
+                        usb_dev = usb.core.find(
+                            idVendor=port_info.vid,
+                            idProduct=port_info.pid
+                        )
+                        if usb_dev is not None:
+                            # SET_CONTROL_LINE_STATE: DTR=1, RTS=1
+                            usb_dev.ctrl_transfer(
+                                0x21, 0x22, 0x0003, 0, None, timeout=1000
+                            )
+                except Exception:
+                    pass
+
             # Open UART device
             self.__uart = Serial(self.__port, self.__baudrate)
 

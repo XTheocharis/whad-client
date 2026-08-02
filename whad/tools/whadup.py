@@ -19,6 +19,7 @@ from whad.hub.dot15d4 import Commands as Dot15d4Commands
 from whad.hub.esb import Commands as ESBCommands
 from whad.hub.unifying import Commands as UnifyingCommands
 from whad.hub.phy import Commands as PhyCommands
+from whad.hub.board import Commands as BoardCommands
 from whad.hub.discovery import Domain, Capability
 
 
@@ -33,7 +34,8 @@ DOMAINS = {
     Domain.LogitechUnifying: "Logitech Unifying",
     Domain.Mosart: "Mosart",
     Domain.SixLowPan: "6LowPan",
-    Domain.Dot15d4: "802.15.4"
+    Domain.Dot15d4: "802.15.4",
+    Domain.Board: "Board"
 }
 
 CAPABILITIES = {
@@ -44,7 +46,11 @@ CAPABILITIES = {
     Capability.Jam: "can jam communications",
     Capability.SimulateRole: "can simulate a role in a communication",
     Capability.Sniff: "can sniff data",
-    Capability.NoRawData: "can not read/write raw packet"
+    Capability.NoRawData: "can not read/write raw packet",
+    Capability.Read: "can read board resources",
+    Capability.Write: "can write board resources",
+    Capability.Stream: "can stream board events",
+    Capability.Store: "can use board storage"
 }
 
 BLE_COMMANDS = {
@@ -166,12 +172,44 @@ PHY_COMMANDS = {
     PhyCommands.Stop: "Stop: can stop depending on the current mode",
 }
 
+BOARD_COMMANDS = {
+    BoardCommands.GetBoardInfo: "GetBoardInfo: can read board information",
+    BoardCommands.ListSensors: "ListSensors: can enumerate board sensors",
+    BoardCommands.ReadSensor: "ReadSensor: can read one sensor sample",
+    BoardCommands.ConfigureStream: "ConfigureStream: can configure sensor streams",
+    BoardCommands.StopStream: "StopStream: can stop sensor streams",
+    BoardCommands.Calibrate: "Calibrate: can calibrate sensors",
+    BoardCommands.GetCalibration: "GetCalibration: can read calibration data",
+    BoardCommands.SetOutput: "SetOutput: can control outputs",
+    BoardCommands.GetInputState: "GetInputState: can read input state",
+    BoardCommands.ConfigureInput: "ConfigureInput: can configure input behavior",
+    BoardCommands.I2cTransfer: "I2cTransfer: can run I2C transfers",
+    BoardCommands.GpioConfigure: "GpioConfigure: can configure GPIO pins",
+    BoardCommands.GpioRead: "GpioRead: can read GPIO pins",
+    BoardCommands.GpioWrite: "GpioWrite: can write GPIO pins",
+    BoardCommands.AdcRead: "AdcRead: can read ADC channels",
+    BoardCommands.SpiTransfer: "SpiTransfer: can run SPI transfers",
+    BoardCommands.StorageInfo: "StorageInfo: can read storage status",
+    BoardCommands.StorageAdopt: "StorageAdopt: can adopt board storage",
+    BoardCommands.StorageReadLog: "StorageReadLog: can read board logs",
+    BoardCommands.StorageEraseLog: "StorageEraseLog: can erase board logs",
+    BoardCommands.GetRuntimeConfig: "GetRuntimeConfig: can read runtime configuration",
+    BoardCommands.SetRuntimeConfig: "SetRuntimeConfig: can update runtime configuration",
+    BoardCommands.SetRuntimeMode: "SetRuntimeMode: can switch runtime mode",
+    BoardCommands.RemoteProfileGet: "RemoteProfileGet: can read HID remote profiles",
+    BoardCommands.RemoteProfileSet: "RemoteProfileSet: can write HID remote profiles",
+    BoardCommands.AudioConfigure: "AudioConfigure: can configure audio metrics",
+    BoardCommands.ReleasePin: "ReleasePin: can release leased resources",
+    BoardCommands.RawPcmDiagnostics: "RawPcmDiagnostics: can stream raw PCM diagnostics"
+}
+
 COMMANDS = {
     Domain.BtLE: BLE_COMMANDS,
     Domain.Esb: ESB_COMMANDS,
     Domain.Dot15d4: DOT15D4_COMMANDS,
     Domain.LogitechUnifying: UNIFYING_COMMANDS,
-    Domain.Phy: PHY_COMMANDS
+    Domain.Phy: PHY_COMMANDS,
+    Domain.Board: BOARD_COMMANDS
 
 }
 
@@ -187,7 +225,8 @@ def get_readable_capabilities(caps: int) -> List[str]:
     capabilities = []
     for i in range(24):
         if caps & (1 << i):
-            capabilities.append(CAPABILITIES[caps & (1 << i)])
+            capability = caps & (1 << i)
+            capabilities.append(CAPABILITIES.get(capability, f"unknown capability 0x{capability:x}"))
     return capabilities
 
 def get_commands_desc(domain: str, commands: int) -> List[str]:
@@ -227,6 +266,11 @@ def error(message):
 def main():
     """Main whadup/wup function.
     """
+    if len(sys.argv) >= 2 and sys.argv[1] in ("-h", "--help"):
+        print("Usage: whadup [interface]")
+        print("Without an interface, list available WHAD devices.")
+        return
+
     if len(sys.argv) >= 2:
         # Retrieve target interface
         interface = sys.argv[1]
