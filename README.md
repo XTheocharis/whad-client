@@ -37,7 +37,7 @@ The tests are automatically run by github actions when something is pushed to ma
 
 ## What's different on the `clue` branch
 
-This is the `XTheocharis/whad-client` fork (branch `clue`) tracking `upstream/whad-team/whad-client#main`. The branch adds an **8th WHAD domain (Board)** end-to-end and two Linux-7.1.5 `cdc_acm` compatibility fixes for the ButteRFly dongle. 5 commits ahead of upstream/main; merge base is `57f7370e` (2026-06-18).
+This is the `XTheocharis/whad-client` fork (branch `clue`) tracking `upstream/whad-team/whad-client#main`. The branch adds an **8th WHAD domain (Board)** end-to-end and two Linux-7.1.5 `cdc_acm` compatibility fixes for the ButteRFly dongle.
 
 ### Board domain package — `whad/hub/board/` (NEW, 5 files, 644L)
 Hand-written wrappers around the generated `whad/protocol/board/board_pb2.py`. Every class is `@pb_bind`-registered into the `BoardDomain` `Registry` so `BoardDomain.parse(version, msg)` can dispatch by oneof name.
