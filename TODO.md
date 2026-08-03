@@ -3,11 +3,11 @@ Python library allowing to interact with offensive security tools implementing t
 
 ### First release
 - [ ] harmonize metadatas and translators in hub for each protocol
-- [ ] include parameters as optional field for PHY message (modulation, datarate, freq, endinanness, ...)
-  - [ ] modify phy protocol definition
-  - [ ] adapt in whad-lib
-  - [ ] adapt in whad-client hub
-  - [ ] adapt in butterfly
+- [x] include parameters as optional field for PHY message (modulation, datarate, freq, endinanness, ...)
+  - [x] modify phy protocol definition
+  - [x] adapt in whad-lib
+  - [x] adapt in whad-client hub
+  - [x] adapt in butterfly
   - [ ] fix bugs in yardstickone, timeout are too frequent
 - [ ] winject
   - [ ] integrate a InjectionConfiguration or equivalent
@@ -47,14 +47,14 @@ Python library allowing to interact with offensive security tools implementing t
 
 ### WHAD library
 - [ ] Implementing BLE hooking
-- [ ] Implementing SM layer in BLE stack
-- [ ] Implementing Peripheral role in BLE stack
-  - [ ] Checking integration with existing connectors (e.g., Hijacker)
+- [x] Implementing SM layer in BLE stack
+- [x] Implementing Peripheral role in BLE stack
+  - [x] Checking integration with existing connectors (e.g., Hijacker)
 - [ ] Implementing BLE Jammer connector
 - [ ] Implementing wireshark / PCAP export
-- [ ] Implementing Zigbee connectors and stack
-- [ ] Implementing ESB connectors and stack
-  - [ ] Adding scapy layers
+- [x] Implementing Zigbee connectors and stack
+- [x] Implementing ESB connectors and stack
+  - [x] Adding scapy layers
 - [ ] Implementing Mosart connectors and stack
   - [ ] Adding scapy layers
 - [ ] Implementing ANT protocol connectors and stack (ANT+ and ANT-FS)
@@ -200,14 +200,14 @@ Python library allowing to interact with offensive security tools implementing t
     - [x] whad.tools.winject
     - [x] whad.tools.winstall
     - [x] whad.tools.wplay
-    - [x] whad.tools.wreplay
+    - [x] whad.tools.wreplay  # note: module exists but no pyproject.toml entry point
     - [x] whad.tools.wserver
     - [x] whad.tools.wshark
     - [x] whad.tools.wsniff
 - [ ] whad.unifying
     - [ ] whad.unifying.cli
     - [ ] whad.unifying.connector
-    - [ ] whad.unifuing.hid
+    - [ ] whad.unifying.hid
     - [ ] whad.unifying.stack
     - [ ] whad.unifying.tools
     - [ ] whad.unifying.utils
