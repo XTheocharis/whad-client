@@ -37,14 +37,14 @@ The tests are automatically run by github actions when something is pushed to ma
 
 ## What's different on the `clue` branch
 
-This is the `XTheocharis/whad-client` fork (branch `clue`) tracking `upstream/whad-team/whad-client#main`. The branch adds a **9th WHAD domain (Board)** end-to-end and two Linux-7.1.5 `cdc_acm` compatibility fixes for the ButteRFly dongle. 3 commits ahead of upstream/main; merge base is `57f7370e` (2026-06-18).
+This is the `XTheocharis/whad-client` fork (branch `clue`) tracking `upstream/whad-team/whad-client#main`. The branch adds an **8th WHAD domain (Board)** end-to-end and two Linux-7.1.5 `cdc_acm` compatibility fixes for the ButteRFly dongle. 5 commits ahead of upstream/main; merge base is `57f7370e` (2026-06-18).
 
 ### Board domain package — `whad/hub/board/` (NEW, 5 files, 644L)
 Hand-written wrappers around the generated `whad/protocol/board/board_pb2.py`. Every class is `@pb_bind`-registered into the `BoardDomain` `Registry` so `BoardDomain.parse(version, msg)` can dispatch by oneof name.
 - `common.py` (58L) — `BoardMessage` base, 5 exceptions (`BoardConnectorError`, `BoardPendingRequestFull`, `BoardDuplicateRequest`, `BoardRequestTimeout`, `BoardEventQueueFull`), `PendingRequest` queue.
 - `domain.py` (145L) — `BoardDomain(Registry)` factory + `Commands` enum (28 values 0x00-0x1B) + 26 `create_*` convenience methods.
 - `events.py` (78L) — 6 unsolicited event wrappers: `SensorSample`, `AudioChunk`, `InputEvent`, `GestureEvent`, `LogChunk`, `BoardStatus`.
-- `requests.py` (235L) — 27 request wrappers (one per outbound command).
+- `requests.py` (235L) — 28 request wrappers (one per outbound command).
 - `responses.py` (158L) — 15 response wrappers.
 
 ### Board connector — `whad/board/connector/base.py` (NEW, 441L)
@@ -86,7 +86,7 @@ All use `whad.device.mock.MockDevice` + `@MockDevice.route(RequestClass)` decora
 - `.gitignore` — adds `*.pyc` + `AGENTS.md`.
 
 ### Notes
-- `whadup` does NOT advertise Board (it lists only radio domains). Board is reached via `wboard` CLI or `BoardConnector` directly.
+- `whadup` shows Board alongside the radio domains. Board has no scapy layer — reached via `wboard` CLI or `BoardConnector` directly.
 - After every `wboard`/`whadup` invocation, raw-WHAD firmware resets on CDC close. Wait ~3-4s for re-enumeration before the next command.
 - No `examples/board/` directory yet (every other domain has examples). Good first-issue candidate.
 
