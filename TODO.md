@@ -57,7 +57,7 @@ Python library allowing to interact with offensive security tools implementing t
   - [x] Adding scapy layers
 - [ ] Implementing Mosart connectors and stack
   - [ ] Adding scapy layers
-- [ ] Implementing ANT protocol connectors and stack (ANT+ and ANT-FS)
+- [ ] Implementing ANT protocol connectors and stack (ANT+ and ANT-FS)  # implemented in upstream/feat-ant, not merged to main
   - [ ] Adding scapy layers
 - [ ] Implementing Generic GFSK protocol connectors
 - [ ] Improving examples structure, adding support of parameters
