@@ -51,7 +51,7 @@ Python library allowing to interact with offensive security tools implementing t
 - [x] Implementing Peripheral role in BLE stack
   - [x] Checking integration with existing connectors (e.g., Hijacker)
 - [ ] Implementing BLE Jammer connector
-- [ ] Implementing wireshark / PCAP export
+- [x] Implementing wireshark / PCAP export
 - [x] Implementing Zigbee connectors and stack
 - [x] Implementing ESB connectors and stack
   - [x] Adding scapy layers
