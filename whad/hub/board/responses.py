@@ -1,9 +1,26 @@
-from whad.hub.message import PbFieldBool, PbFieldBytes, PbFieldInt
+from whad.hub.message import PbFieldBool, PbFieldBytes, PbFieldInt, PbFieldMsg
 from whad.protocol.board import board_pb2 as pb
 
 from .common import BoardMessage
 from .domain import BoardDomain
 from ..message import pb_bind
+
+
+class SensorDescriptor:
+    """Wrapper exposing the raw protobuf ``SensorDescriptor`` fields.
+
+    ``PbFieldMsg`` calls ``wrap_class(pb_message)`` on read, so we forward
+    attribute access to the underlying protobuf message.
+    """
+
+    def __init__(self, message):
+        self.__dict__["_pb"] = message
+
+    def __getattr__(self, name):
+        return getattr(self.__dict__["_pb"], name)
+
+    def __setattr__(self, name, value):
+        setattr(self.__dict__["_pb"], name, value)
 
 
 @pb_bind(BoardDomain, "command_result", 1)
@@ -33,8 +50,22 @@ class BoardInfoResponse(BoardMessage):
 class ListSensorsResponse(BoardMessage):
     BOARD_FIELD = "sensor_descriptor"
     PAYLOAD_CLS = pb.ListSensorsResponse
+    descriptor = PbFieldMsg("board.sensor_descriptor.descriptor", SensorDescriptor)
     next_cursor = PbFieldInt("board.sensor_descriptor.next_cursor")
     eof = PbFieldBool("board.sensor_descriptor.eof")
+
+    def set_field_value(self, field, value):
+        # PbFieldMsg fields cannot be assigned with setattr (protobuf rejects
+        # direct assignment to message-typed fields); use CopyFrom instead.
+        if isinstance(field, PbFieldMsg):
+            path_nodes = field.path.split('.')
+            root_node = self.message
+            for node in path_nodes[:-1]:
+                root_node = getattr(root_node, node)
+            pb_value = value._pb if isinstance(value, SensorDescriptor) else value
+            getattr(root_node, path_nodes[-1]).CopyFrom(pb_value)
+        else:
+            super().set_field_value(field, value)
 
 
 @pb_bind(BoardDomain, "stream_configured", 1)

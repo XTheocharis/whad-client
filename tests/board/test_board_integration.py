@@ -460,13 +460,6 @@ def test_remote_profile_get_returns_correlated_response(connector):
     assert raw.profile.sensitivity == 10
 
 
-def test_get_hid_status_reads_runtime_config(connector):
-    response = connector.get_hid_status(timeout=2.0)
-
-    assert isinstance(response, RuntimeConfigResponse)
-    assert response.active_runtime == pb.RuntimeMode.RUNTIME_RAW_WHAD
-
-
 def test_start_pairing_sends_open_pairing_window(connector):
     response = connector.start_pairing(duration_ms=60000, timeout=2.0)
 

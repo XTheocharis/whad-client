@@ -82,25 +82,16 @@ class Sniffer(Dot15d4, EventsManager):
         :param timeout: Timeout in seconds (disabled if set to `None`)
         :type timeout: float, optional
         """
-        start = time()
         try:
-            while True:
-                if self.support_raw_pdu():
-                    message_type = RawPduReceived
-                else:
-                    message_type = PduReceived
+            if self.support_raw_pdu():
+                message_type = RawPduReceived
+            else:
+                message_type = PduReceived
 
-                # Wait for a message to be received
-                message = self.wait_for_message(keep=message_filter(message_type), timeout=1)
-                if message is not None:
-                    packet = message.to_packet()
-                    if packet is not None:
-                        self.monitor_packet_rx(packet)
-                        yield packet
-
-                # Check if timeout has been reached (if provided)
-                if timeout is not None:
-                    if time() - start >= timeout:
-                        break
+            for message in super().capture(messages=(message_type,), timeout=timeout):
+                packet = message.to_packet()
+                if packet is not None:
+                    self.monitor_packet_rx(packet)
+                    yield packet
         except WhadDeviceDisconnected:
             return

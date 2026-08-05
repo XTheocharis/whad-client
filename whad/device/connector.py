@@ -30,7 +30,7 @@ that implements a set of features out-of-the-box:
 Sniffing packet and messages could be useful to implement packet sniffers or
 intercept some specific events like disconnection of the linked hardware device.
 Most of the time this feature is used to sniff packets related to a target domain.
-The :py:function:`whad.device.connector.Connector.sniff` method is specifically
+The :py:function:`whad.device.connector.Connector.capture` method is specifically
 tailored for this use. When not sniffing, packets received from the hardware device
 are forwarded to the connector's packet processing methods than can be overriden by
 inheriting classes.
@@ -773,13 +773,13 @@ class Connector:
                     self.process_message(event.message)
 
     # pylint: disable=C0301
-    def sniff(self, messages: List = None, timeout: float = None) -> Generator[HubMessage, None, None]:
-        """Enable sniffing mode and report any received messages, optionally
+    def capture(self, messages: List = None, timeout: float = None) -> Generator[HubMessage, None, None]:
+        """Enable capture mode and report any received messages, optionally
         filtered by their type/classes if `messages` is provided.
 
-        :param messages: If specified, sniff only messages that match the given types.
+        :param messages: If specified, capture only messages that match the given types.
         :param messages: List, optional
-        :param timeout: If specified, set a sniffing timeout in seconds
+        :param timeout: If specified, set a capture timeout in seconds
         :type timeout: float, optional
         """
         # Enable sniffing mode (and disable message processing)
