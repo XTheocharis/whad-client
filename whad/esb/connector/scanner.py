@@ -24,7 +24,6 @@ an :class:`UnsupportedCapability` exception.
 from typing import Iterator
 from scapy.packet import Packet
 
-from whad.helpers import message_filter
 from whad.exceptions import UnsupportedCapability
 
 from whad.hub.esb import PduReceived, RawPduReceived
@@ -55,7 +54,7 @@ class Scanner(ESB):
         self.stop()
 
         # Switch to sniffing mode
-        super().sniff(show_acknowledgements=True, address="FF:FF:FF:FF:FF")
+        super().start_sniff(show_acknowledgements=True, address="FF:FF:FF:FF:FF")
 
     def start(self):
         """Start the ESB scanner.
@@ -70,13 +69,12 @@ class Scanner(ESB):
         """
         Listen and yield incoming ESB PDUs.
         """
-        while True:
-            if self.support_raw_pdu():
-                message_type = RawPduReceived
-            else:
-                message_type = PduReceived
+        if self.support_raw_pdu():
+            message_type = RawPduReceived
+        else:
+            message_type = PduReceived
 
-            message = self.wait_for_message(keep=message_filter(message_type))
+        for message in super().capture(messages=(message_type,)):
             if issubclass(message, AbstractPacket):
                 packet = message.to_packet()
                 if packet is not None:
