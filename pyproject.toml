@@ -98,6 +98,9 @@ whad = [
   "resources/clues/data/CLUES_data_human_verified.json",
 ]
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [project.urls]
 Homepage = "https://whad.io/"
 Documentation = "https://whad.readthedocs.io/en/stable/"
