@@ -112,23 +112,6 @@ class BoardConnector(Connector):
         message = self.hub.board.create_get_calibration(sensor_id=sensor_id)
         return self.send_request(message, timeout=timeout)
 
-    def motion_samples(self, sensor_id=None, timeout=0.5):
-        """Generator yielding SensorSample events from active streams.
-
-        If sensor_id is given, yields only samples for that sensor.
-        Otherwise yields all SensorSample events.
-        """
-        from whad.hub.board import SensorSample
-        while True:
-            event = self.next_event(timeout=timeout)
-            if event is None:
-                continue
-            if not isinstance(event, SensorSample):
-                continue
-            if sensor_id is not None and event.sensor_id != sensor_id:
-                continue
-            yield event
-
     def next_event(self, timeout=None):
         try:
             return self.__event_queue.get(block=True, timeout=timeout)
@@ -283,10 +266,6 @@ class BoardConnector(Connector):
         message = self.hub.board.create_release_pin(
             resource=resource, instance=instance)
         return self.send_request(message, timeout=timeout)
-
-    def get_hid_status(self, timeout=None):
-        return self.send_request(
-            self.hub.board.create_get_runtime_config(), timeout=timeout)
 
     def storage_info(self, timeout=None):
         return self.send_request(
