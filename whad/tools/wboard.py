@@ -10,8 +10,14 @@ def parse_hex(value):
     return bytes.fromhex(value.replace(":", ""))
 
 
-def print_response(response):
-    print(response)
+def print_response(response, json_mode=False):
+    if response is None:
+        return
+    if json_mode:
+        from google.protobuf.json_format import MessageToJson
+        print(MessageToJson(response.message, preserving_proto_field_name=True))
+    else:
+        print(response)
 
 
 def require_flag(args, attr, message):
@@ -33,20 +39,16 @@ def request_runtime_mode(connector, args):
 
 
 def request_runtime_open_pairing(connector, args):
-    message = connector.hub.board.create("set_runtime_config")
-    message.message.board.set_runtime_config.open_pairing_window.duration_ms = args.duration_ms
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.start_pairing(duration_ms=args.duration_ms, timeout=args.timeout)
 
 
 def request_runtime_clear_bonds(connector, args):
     require_flag(args, "yes_really_clear_bonds", "clear-bonds requires --yes-really-clear-bonds")
-    message = connector.hub.board.create("set_runtime_config")
-    message.message.board.set_runtime_config.clear_bonds.confirm_nonce = args.confirm_nonce
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.forget_bonds(confirm_nonce=args.confirm_nonce, timeout=args.timeout)
 
 
 def request_sensor_list(connector, args):
-    return connector.send_request(connector.hub.board.create_list_sensors(cursor=args.cursor), timeout=args.timeout)
+    return connector.list_sensors(cursor=args.cursor, timeout=args.timeout)
 
 
 def request_sensor_read(connector, args):
@@ -62,8 +64,7 @@ def request_stream_stop(connector, args):
 
 
 def request_calibration_run(connector, args):
-    message = connector.hub.board.create_calibrate(sensor_id=args.sensor_id, flags=args.flags, persist=args.persist)
-    return connector.send_request(message, timeout=args.timeout, keep_pending=True)
+    return connector.calibrate(sensor_id=args.sensor_id, flags=args.flags, persist=args.persist, timeout=args.timeout)
 
 
 def request_calibrate_imu(connector, args):
@@ -75,33 +76,29 @@ def request_calibrate_mag(connector, args):
 
 
 def request_calibration_get(connector, args):
-    message = connector.hub.board.create_get_calibration(sensor_id=args.sensor_id)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.get_calibration(sensor_id=args.sensor_id, timeout=args.timeout)
 
 
 def request_input_state(connector, args):
-    return connector.send_request(connector.hub.board.create_get_input_state(), timeout=args.timeout)
+    return connector.get_input_state(timeout=args.timeout)
 
 
 def request_input_configure(connector, args):
-    message = connector.hub.board.create_configure_input(mode=args.mode, flags=args.flags, dwell_ms=args.dwell_ms, deadzone=args.deadzone, persist=args.persist)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.configure_input(mode=args.mode, flags=args.flags, dwell_ms=args.dwell_ms, deadzone=args.deadzone, persist=args.persist, timeout=args.timeout)
 
 
 def request_audio_configure(connector, args):
-    message = connector.hub.board.create_audio_configure(enabled=args.enabled, sample_rate_hz=args.sample_rate_hz, gain_db_x2=args.gain_db_x2, flags=args.flags)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.configure_audio(enabled=args.enabled, sample_rate_hz=args.sample_rate_hz, gain_db_x2=args.gain_db_x2, flags=args.flags, timeout=args.timeout)
 
 
 def request_raw_pcm(connector, args):
+    # connector.raw_pcm_diagnostics() is a generator; this leaf needs a single response.
     message = connector.hub.board.create_raw_pcm_diagnostics(duration_ms=args.duration_ms, chunk_size=args.chunk_size)
     return connector.send_request(message, timeout=args.timeout, keep_pending=True)
 
 
 def request_audio_metrics(connector, args):
-    stream_msg = connector.hub.board.create_configure_stream(
-        sensor_id=13, rate_millihz=20000, flags=0)
-    connector.send_request(stream_msg, timeout=args.timeout)
+    connector.configure_stream(sensor_id=13, rate_millihz=20000, timeout=args.timeout)
     count = 0
     try:
         for sample in connector.audio_metrics(timeout=args.timeout):
@@ -117,13 +114,11 @@ def request_audio_metrics(connector, args):
 
 
 def request_output_set(connector, args):
-    message = connector.hub.board.create_set_output(target=args.target, value=args.value, duration_ms=args.duration_ms, force=args.force)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.set_output(target=args.target, value=args.value, duration_ms=args.duration_ms, force=args.force, timeout=args.timeout)
 
 
 def request_output_stop(connector, args):
-    message = connector.hub.board.create_set_output(target=args.target, stop=True, force=args.force)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.stop_output(target=args.target, force=args.force, timeout=args.timeout)
 
 
 def request_output_buzzer(connector, args):
@@ -182,37 +177,23 @@ def request_adc_read(connector, args):
 
 
 def request_i2c_transfer(connector, args):
-    message = connector.hub.board.create_i2c_transfer(address=args.address, write_data=args.write_data, read_length=args.read_length, repeated_start=args.repeated_start, frequency_hz=args.frequency_hz, force=args.force)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.i2c_transfer(address=args.address, write_data=args.write_data, read_length=args.read_length, repeated_start=args.repeated_start, frequency_hz=args.frequency_hz, force=args.force, timeout=args.timeout)
 
 
 def request_spi_transfer(connector, args):
-    message = connector.hub.board.create_spi_transfer(cs_pin=args.cs_pin, frequency_hz=args.frequency_hz, mode=args.mode, tx_data=args.tx_data, read_length=args.read_length, force=args.force)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.spi_transfer(cs_pin=args.cs_pin, frequency_hz=args.frequency_hz, mode=args.mode, tx_data=args.tx_data, read_length=args.read_length, force=args.force, timeout=args.timeout)
 
 
 def request_profile_get(connector, args):
-    return connector.send_request(connector.hub.board.create_remote_profile_get(profile_id=args.profile_id), timeout=args.timeout)
+    return connector.remote_profile_get(profile_id=args.profile_id, timeout=args.timeout)
 
 
 def request_profile_set(connector, args):
-    message = connector.hub.board.create_remote_profile_set(persist=args.persist)
-    profile = message.message.board.remote_profile_set.profile
-    profile.profile_id = args.profile_id
-    profile.name = args.name
-    profile.sensitivity = args.sensitivity
-    profile.deadzone = args.deadzone
-    profile.pointer_mode = args.pointer_mode
-    profile.tilt_mode = args.tilt_mode
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.remote_profile_set(profile_id=args.profile_id, name=args.name, sensitivity=args.sensitivity, deadzone=args.deadzone, pointer_mode=args.pointer_mode, tilt_mode=args.tilt_mode, persist=args.persist, timeout=args.timeout)
 
 
 def request_pair_window(connector, args):
     return connector.start_pairing(duration_ms=args.duration_ms, timeout=args.timeout)
-
-
-def request_hid_status(connector, args):
-    return connector.get_hid_status(timeout=args.timeout)
 
 
 def request_forget_bonds(connector, args):
@@ -222,8 +203,7 @@ def request_forget_bonds(connector, args):
 
 def request_pin_release(connector, args):
     require_flag(args, "yes_release_pin", "pin-release requires --yes-release-pin")
-    message = connector.hub.board.create_release_pin(resource=args.resource, instance=args.instance)
-    return connector.send_request(message, timeout=args.timeout)
+    return connector.release_pin(resource=args.resource, instance=args.instance, timeout=args.timeout)
 
 
 SENSOR_ID_COLOR = 10
@@ -253,8 +233,12 @@ def request_apds_stream_proximity(connector, args):
         SENSOR_ID_PROXIMITY, args.rate_millihz, timeout=args.timeout)
 
 
-def request_apds_profile(connector, args):
-    return connector.get_input_state(timeout=args.timeout)
+def request_shell(connector, args):
+    """Open an interactive shell holding the connector open across commands."""
+    from whad.cli.board_shell import BoardShell
+
+    BoardShell(connector, timeout=args.timeout).run()
+    return None
 
 
 def add_common_io(parser):
@@ -320,7 +304,6 @@ def build_parser():
     hid = subcommands.add_parser("hid").add_subparsers(dest="hid_command", required=True)
     pair = add_leaf(hid, "pair", request_pair_window)
     pair.add_argument("--duration-ms", type=parse_int, required=True)
-    hid_status = add_leaf(hid, "status", request_hid_status)
     hid_forget = add_leaf(hid, "forget", request_forget_bonds)
     hid_forget.add_argument("--confirm-nonce", type=parse_int, required=True)
     hid_forget.add_argument("--yes-really-clear-bonds", action="store_true")
@@ -434,11 +417,11 @@ def build_parser():
     add_leaf(apds, "color", request_apds_color)
     add_leaf(apds, "proximity", request_apds_proximity)
     add_leaf(apds, "gesture", request_apds_gesture)
-    add_leaf(apds, "profile", request_apds_profile)
     apds_stream_color = add_leaf(apds, "stream-color", request_apds_stream_color)
     apds_stream_color.add_argument("rate_millihz", type=parse_int)
     apds_stream_proximity = add_leaf(apds, "stream-proximity", request_apds_stream_proximity)
     apds_stream_proximity.add_argument("rate_millihz", type=parse_int)
+    add_leaf(subcommands, "shell", request_shell)
     return parser
 
 
@@ -450,7 +433,8 @@ def run(args):
     connector = BoardConnector(device)
     try:
         response = args.handler(connector, args)
-        print_response(response)
+        if response is not None:
+            print_response(response, json_mode=getattr(args, "json", False))
     finally:
         connector.close()
 
