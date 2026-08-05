@@ -1,3 +1,144 @@
+Release notes for version 1.2.17
+===============================
+
+Bugfixes
+--------
+
+- Fixed undefined `data` variable replaced with `payload` in `TCPSocketDevice.write()` (issue #360)
+
+Important changes
+-----------------
+
+### CLUES database migrated to latest version
+
+The bundled CLUES database has been migrated to its latest version. The
+database structure has been modified in this migration, consumers of the
+CLUES API must verify their integration against the new schema.
+
+
+Release notes for version 1.2.16
+===============================
+
+Bugfixes
+--------
+
+- Fixed `is_access_address_valid()`
+- Fixed `UnicodeDecodeError` when decoding BLE device name
+- Fixed incorrect RF channel computation in BLE packet metadata generation
+- Fixed a bug in WHAD's `UUID` class
+- Fixed Wireshark issues in `wble-central` and a BLE profile discovery bug in GATT
+- Fixed BLE active connection sniffing
+- Fixed type annotations to make them compatible with Python <= 3.10
+
+New features
+------------
+
+### PCAP overwrite
+
+`PcapWriterMonitor` can now overwrite existing PCAP files.
+
+### Improved connection synchronization output
+
+`wsniff` now provides improved output during connection synchronization.
+
+Important changes
+-----------------
+
+### Tool chaining
+
+This release introduces an argument to disable tool chaining, then removes the
+`--disable-chaining` option (it was a duplicate of `--force-stdout`).
+The `--force-stdout` option (introduced in 1.2.15) remains the supported way
+to force dual stdout/chaining output.
+
+
+Release notes for version 1.2.15
+===============================
+
+Bugfixes
+--------
+
+- Fixed long read GATT operation in `wble-central`
+- Fixed BLE encryption issue caused by `_on_whad_ble_encryption()` being incorrectly renamed to `_1le_encryption()`
+- Fixed a bug in the cryptobox unit test
+- Fixed a crash in WHAD's BLE analyzer class used by `wanalyze`
+- Fixed some typos in the `address` field used for debugging
+
+New features
+------------
+
+### BLE pairing with raw PDU devices
+
+Added tracing and an attempted fix for BLE pairing with devices supporting raw
+BLE PDUs. WHAD's BLE stack now checks for raw PDU injection support in
+`send_ctrl_pdu()` (control PDUs may be sent during pairing) and excludes HCI
+from the existing control PDU sending checks.
+
+### Encryption handling
+
+Encryption enabling has been moved to `on_start_enc_req` to allow normal
+processing of `ll_start_enc_rsp`.
+
+Important changes
+-----------------
+
+### `--stdout` renamed to `--force-stdout`
+
+The `--stdout` option has been renamed to `--force-stdout` for command-line
+applications providing a dual (stdout/chaining) output, to remove the
+ambiguity with the implicit stdout output of source tools. Documentation has
+been updated accordingly.
+
+### Tool chaining can be disabled
+
+A new command-line application class has been added to allow the tool chaining
+feature to be disabled by the user.
+
+
+Release notes for version 1.2.14
+===============================
+
+Bugfixes
+--------
+
+- Fixed an error in `wsniff` when the target PCAP file already exists
+- Fixed a bug when `Central` cannot read a descriptor value (sometimes seen with some weird devices; the descriptor is now considered as `00 00`)
+- Fixed a regression in BLE characteristic notification/indication subscription
+
+New features
+------------
+
+### PHY sniffing example
+
+Added an example for `wsniff`'s PHY domain `--sync-word` option.
+
+Improvements
+------------
+
+- Added a warning when the packet size set for sniffing is rejected by hardware
+- Updated error messages
+
+
+Release notes for version 1.2.13
+===============================
+
+Bugfixes
+--------
+
+- Fixed `profile` command to avoid stall
+- Fixed a bug in GATT read long procedure (`ReadBlobRequest` was used to read the first part instead of a `ReadRequest`)
+- `wble-central`'s `read` command now forces the read long procedure
+- Renamed `ESB.sniff()` to `ESB.start_sniff()` to fix a regression in ESB's `Sniffer` connector
+- Fixed a bug in ESB injector (`PTX` was incorrectly imported from `whad.esb.base` instead of `whad.esb.ptx`)
+
+New features
+------------
+
+### Connection MTU retrieval
+
+Added a method to retrieve the host's current connection MTU.
+
+
 Release notes for versions 1.2.12
 =================================
 

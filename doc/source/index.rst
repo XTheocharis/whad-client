@@ -81,6 +81,17 @@ Welcome to WHAD's documentation!
 
 .. toctree::
     :maxdepth: 1
+    :caption: Board API
+
+    board/started
+    board/sensors
+    board/storage
+    board/expert_io
+    board/runtime
+
+
+.. toctree::
+    :maxdepth: 1
     :caption: Contributing
 
     device/firmware
