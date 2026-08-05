@@ -25,7 +25,7 @@ from whad.ble.profile.advdata import (
 from whad.ble.profile.services import BatteryService, DeviceInformationService, GapService, HeartRateService
 from whad.ble.connector.base import BLE
 from whad.ble.connector import (
-    Central, Peripheral, Sniffer, Hijacker, Injector, Scanner, PeripheralClient, Scanner
+    Central, Peripheral, Sniffer, Hijacker, Injector, Scanner, PeripheralClient
 )
 from whad.ble.utils.phy import PHYS
 
